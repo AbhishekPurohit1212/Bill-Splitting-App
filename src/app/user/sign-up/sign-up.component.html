@@ -1,0 +1,79 @@
+<div class="d-flex justify-content-center" *ngIf="showSpinner">
+  <div class="spinner-border" role="status">
+    <span class="sr-only" id="loading"></span>
+  </div>
+</div>
+<div>
+  <img
+    src="../../../assets/img/faa43fcf41844550b7a34ce866dcd8d9.png"
+    id="icon"
+    alt="Splitter Icon"
+  />
+</div>
+<!-- we name this form "signupform" and assign its value is ngform, onSubmit() is a function is invoked when ngsubmit event fires -->
+<form
+  #signUpForm="ngForm"
+  (ngSubmit)="signUpForm.valid && onSubmit(signUpForm)"
+>
+  <!-- created a variable "fullName" and assigned its value ngmodel. name attribute of input tag = fullName. Here ngclass is used to create dynamic class on html for using it in CSS-->
+  <input
+    type="text"
+    #fullName="ngModel"
+    [(ngModel)]="userService.selectedUser.fullName"
+    name="fullName"
+    placeholder="Full Name"
+    required
+    [ngClass]="{ 'invalid-textbox': signUpForm.submitted && !fullName.valid }"
+  />
+  <!-- here we create invalid-textbox dynamic class on input tag  which is created only when "signUpForm.submitted && !fullName.valid" becomes true  -->
+  <div *ngIf="signUpForm.submitted && !fullName.valid">
+    <label class="validation-message">This field is required.</label>
+  </div>
+  <!-- pattern is input tag attribute to define regex for checks -->
+  <input
+    type="text"
+    #email="ngModel"
+    [(ngModel)]="userService.selectedUser.email"
+    name="email"
+    placeholder="Email"
+    required
+    [pattern]="emailRegex"
+    [ngClass]="{ 'invalid-textbox': signUpForm.submitted && !email.valid }"
+  />
+  <!-- email.errors means email is a variable we defined above. -->
+  <div *ngIf="signUpForm.submitted && email.errors">
+    <label *ngIf="email.errors.required" class="validation-message"
+      >This field is required.</label
+    >
+    <label *ngIf="email.errors.pattern" class="validation-message"
+      >Invalid email address.</label
+    >
+  </div>
+  <input
+    type="password"
+    #password="ngModel"
+    [(ngModel)]="userService.selectedUser.password"
+    name="password"
+    placeholder="Password"
+    minlength="4"
+    required
+    [ngClass]="{ 'invalid-textbox': signUpForm.submitted && !password.valid }"
+  />
+  <div *ngIf="signUpForm.submitted && password.errors">
+    <label *ngIf="password.errors.required" class="validation-message"
+      >This field is required.</label
+    >
+    <label *ngIf="password.errors.minlength" class="validation-message"
+      >Enter atleast 4 characters.</label
+    >
+  </div>
+  <input [disabled]="disabled" type="submit" value="Sign Up" />
+</form>
+
+<!-- Success message -->
+<div class="success" *ngIf="showSucessMessage">Saved successfully</div>
+
+<!-- Error message -->
+<div class="alert" *ngIf="serverErrorMessages">
+  {{ serverErrorMessages }}
+</div>

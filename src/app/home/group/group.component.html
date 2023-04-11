@@ -1,0 +1,450 @@
+<div class="d-flex justify-content-center" *ngIf="showSpinner">
+  <div class="spinner-border" role="status">
+    <span class="sr-only" id="loading"></span>
+  </div>
+</div>
+<div class="container">
+  <div class="row my-2">
+    <div class="col-sm-12 col-lg-4">
+      <div class="card" style="box-shadow: 6px 6px 5px rgba(17, 17, 17, 0.1)">
+        <div class="card-body">
+          <div class="d-flex flex-column align-items-center text-center">
+            <img
+              src="../../../assets/img/faa43fcf41844550b7a34ce866dcd8d9.png"
+              id="icon"
+              alt="Splitter Icon"
+              width="100"
+              class="rounded-circle"
+            />
+            <div class="mt-3">
+              <h4>{{ groupDetails.name }}</h4>
+              <p class="text-secondary mb-1">
+                {{ groupDetails.total_persons }} members
+              </p>
+              <p><fa-icon [icon]="faUser"></fa-icon>You</p>
+              <div class="list-group" *ngFor="let user of allUserDetails">
+                <p><fa-icon [icon]="faUser"></fa-icon>{{ user.fullName }}</p>
+              </div>
+              <input type="button" class="disabled" value="Delete Group" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-12 col-lg-8">
+      <div class="row my-2">
+        <div class="col col-lg-6">
+          <button
+            type="button"
+            class="btn btn-success btn-lg"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          >
+            <fa-icon [icon]="faPlusSquare"></fa-icon> Add Expense
+          </button>
+          <!--Add expanse model code start -->
+          <div
+            class="modal fade"
+            id="exampleModal"
+            tabindex="-1"
+            aria-labelledby="exampleModalLabel"
+            aria-hidden="true"
+          >
+            <div
+              class="modal-dialog modal-dialog-centered modal-dialog-scrollable"
+            >
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">
+                    Add an expense
+                  </h5>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <form
+                  #createTransactionForm="ngForm"
+                  (ngSubmit)="
+                    createTransactionForm.valid &&
+                      onSubmitCreateForm(createTransactionForm)
+                  "
+                >
+                  <div class="modal-body">
+                    <!-- created a variable "fullName" and assigned its value ngmodel. name attribute of input tag = fullName. Here ngclass is used to create dynamic class on html for using it in CSS-->
+
+                    <div *ngIf="showUserList">
+                      <label>With you and: </label>
+                      <ng-multiselect-dropdown
+                        [placeholder]="'Add peoples'"
+                        [settings]="userDropdownSettings"
+                        [data]="userDropdownList"
+                        [(ngModel)]="selectedUser"
+                        [ngModelOptions]="{ standalone: true }"
+                        (onSelect)="onUserSelect($event)"
+                        (onSelectAll)="onUserSelectAll($event)"
+                        (onDeSelect)="onUserDeSelect($event)"
+                        (onDeSelectAll)="onUserDeSelectAll($event)"
+                      >
+                      </ng-multiselect-dropdown>
+                    </div>
+                    <input
+                      type="text"
+                      #description="ngModel"
+                      [(ngModel)]="transactionService.selectedUsers.description"
+                      name="description"
+                      placeholder="Add description"
+                      required
+                      [ngClass]="{
+                        'invalid-textbox':
+                          createTransactionForm.submitted && !description.valid
+                      }"
+                    />
+                    <!-- here we create invalid-textbox dynamic class on input tag  which is created only when "createTransactionForm.submitted && !fullName.valid" becomes true  -->
+                    <div
+                      *ngIf="
+                        createTransactionForm.submitted && !description.valid
+                      "
+                    >
+                      <label class="validation-message"
+                        >This field is required.</label
+                      >
+                    </div>
+                    <div *ngIf="showUserList">
+                      <label>Total Amount: ₹</label>
+                      <input
+                        type="number"
+                        #amount="ngModel"
+                        [(ngModel)]="transactionService.selectedUsers.amount"
+                        name="amount"
+                        placeholder="add amount"
+                        required
+                        [ngClass]="{
+                          'invalid-textbox':
+                            createTransactionForm.submitted && !amount.valid
+                        }"
+                      />
+                    </div>
+                    <div *ngIf="!showUserList">
+                      <label
+                        >Total Amount: ₹{{
+                          transactionService.selectedUsers.amount
+                        }}</label
+                      >
+                    </div>
+                    <div class="my-2" *ngIf="showAddPayee">
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        (click)="onClickShowAddPayee()"
+                      >
+                        Add Mutliple Payee
+                      </button>
+                    </div>
+                    <div class="my-2" *ngIf="hideAddPayee">
+                      <button
+                        type="button"
+                        class="btn btn-primary"
+                        (click)="onClickHideAddPayee()"
+                      >
+                        Show Friend list
+                      </button>
+                    </div>
+                    <div class="my-2" *ngIf="showPayee">
+                      <div *ngIf="showPayeeList">
+                        <label>Paid by You and:</label>
+
+                        <ng-multiselect-dropdown
+                          [placeholder]="'Add Payee'"
+                          [settings]="payeeDropdownSettings"
+                          [data]="payeeDropdownList"
+                          [(ngModel)]="selectedPayee"
+                          [ngModelOptions]="{ standalone: true }"
+                          (onSelect)="onPayeeSelect($event)"
+                          (onSelectAll)="onPayeeSelectAll($event)"
+                          (onDeSelect)="onPayeeDeSelect($event)"
+                          (onDeSelectAll)="onPayeeDeSelectAll($event)"
+                        >
+                        </ng-multiselect-dropdown>
+                      </div>
+                      <div class="my-1">
+                        <div class="form-check form-check-inline">
+                          <input
+                            class="form-check-input"
+                            type="radio"
+                            name="inlineRadioOptions"
+                            id="inlineRadio1"
+                            value="option1"
+                            checked
+                            (click)="onClickSplitEqually()"
+                          />
+                          <label class="form-check-label" for="inlineRadio1"
+                            >Split equally
+                          </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input
+                            class="form-check-input"
+                            type="radio"
+                            name="inlineRadioOptions"
+                            id="inlineRadio2"
+                            value="option2"
+                            (click)="onClickSplitUnequally()"
+                          />
+                          <label class="form-check-label" for="inlineRadio2"
+                            >split unequally</label
+                          >
+                        </div>
+                      </div>
+                      <div *ngIf="addMultiplePayeeAmount">
+                        <div
+                          *ngFor="
+                            let payee of transactionService.selectedUsers
+                              .payeeDetails
+                          "
+                        >
+                          <label
+                            ><b>{{ payee.fullName }}</b> paid: ₹
+                          </label>
+                          <input
+                            type="number"
+                            #payeeamount="ngModel"
+                            [(ngModel)]="payee.amount"
+                            name="payeeamount"
+                            placeholder="add amount"
+                            required
+                            [ngClass]="{
+                              'invalid-textbox':
+                                createTransactionForm.submitted &&
+                                !payeeamount.valid
+                            }"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="my-2">
+                      <span
+                        class="badge badge-secondary"
+                        style="background-color: #ed5565"
+                        >{{ date }}</span
+                      >
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <input type="submit" value="Save" />
+                  </div>
+                </form>
+                <!-- Success message -->
+                <p class="success" *ngIf="showSucessMessage">
+                  {{ showSucessMessage }}
+                </p>
+
+                <!-- Error message -->
+                <p class="alert" *ngIf="serverErrorMessages">
+                  {{ serverErrorMessages }}
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- Add expanse model code ends -->
+        </div>
+        <div class="col col-lg-6">
+          <button type="button" class="btn btn-primary btn-lg">
+            <fa-icon [icon]="faUser"></fa-icon> Settle Up
+          </button>
+        </div>
+      </div>
+      <div class="row my-1">
+        <div class="col-sm-12 col-lg-4">
+          <div class="card mb-3" style="width: 12rem">
+            <div class="card-header" style="font-size: 10px">
+              <b>Total Balance</b>
+            </div>
+            <div class="card-body">
+              <p class="card-text" style="color: rgb(11, 138, 49)">
+                <b style="font-size: 25px">₹150</b>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-lg-4">
+          <div class="card mb-3" style="width: 12rem">
+            <div class="card-header" style="font-size: 10px">
+              <b>You Owe</b>
+            </div>
+            <div class="card-body">
+              <p class="card-text" style="color: rgb(185, 17, 17)">
+                <b style="font-size: 25px">₹100</b>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-12 col-lg-4">
+          <div class="card mb-3" style="width: 12rem">
+            <div class="card-header" style="font-size: 10px">
+              <b>You are Owned</b>
+            </div>
+            <div class="card-body">
+              <p class="card-text" style="color: rgb(11, 138, 49)">
+                <b style="font-size: 25px">₹250</b>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="tableFixHead">
+          <table
+            class="table table-hover"
+            style="box-shadow: 6px 6px 5px rgba(7, 6, 6, 0.1)"
+          >
+            <thead>
+              <tr>
+                <th style="color: black">
+                  You owe
+                  <img
+                    src="../../../assets/img/decreasing.png"
+                    width="16"
+                    height="16"
+                  />
+                </th>
+                <th style="color: black">
+                  You are owned
+                  <img
+                    src="../../../assets/img/increase.png"
+                    width="16"
+                    height="16"
+                  />
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="bg-light" style="color: black">
+                  <b>DINESH</b>
+                  <i class="text-secondary">
+                    you owe <b style="color: rgb(185, 17, 17)">₹52.61</b></i
+                  >
+                </td>
+                <td class="bg-light" style="color: black">
+                  RAMAN
+                  <i class="text-secondary">
+                    owes you <b style="color: rgb(11, 138, 49)">₹12.61</b></i
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td class="bg-light" style="color: black">
+                  <b>DINESH</b>
+                  <i class="text-secondary">
+                    you owe <b style="color: rgb(185, 17, 17)">₹52.61</b></i
+                  >
+                </td>
+                <td class="bg-light" style="color: black">
+                  RAMAN
+                  <i class="text-secondary">
+                    owes you <b style="color: rgb(11, 138, 49)">₹12.61</b></i
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td class="bg-light" style="color: black">
+                  <b>DINESH</b>
+                  <i class="text-secondary">
+                    you owe <b style="color: rgb(185, 17, 17)">₹52.61</b></i
+                  >
+                </td>
+                <td class="bg-light" style="color: black">
+                  RAMAN
+                  <i class="text-secondary">
+                    owes you <b style="color: rgb(11, 138, 49)">₹12.61</b></i
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td class="bg-light" style="color: black">
+                  <b>DINESH</b>
+                  <i class="text-secondary">
+                    you owe <b style="color: rgb(185, 17, 17)">₹52.61</b></i
+                  >
+                </td>
+                <td class="bg-light" style="color: black">
+                  RAMAN
+                  <i class="text-secondary">
+                    owes you <b style="color: rgb(11, 138, 49)">₹12.61</b></i
+                  >
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="row my-3">
+        <div class="tableFixHead">
+          <table
+            class="table table-hover"
+            style="box-shadow: 6px 6px 5px rgba(7, 6, 6, 0.1)"
+          >
+            <thead>
+              <tr>
+                <th style="color: black">Activities</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="bg-light" style="color: black">
+                  <span
+                    class="badge badge-secondary"
+                    style="background-color: #ed5565"
+                    >14 Dec</span
+                  >
+                  you
+                  <i class="text-secondary">
+                    paid <b style="color: rgb(11, 138, 49)">₹23</b></i
+                  >
+                  outside with aditya and sood for
+                  <i class="text-secondary"
+                    >petrol bill for car ride to pakistan</i
+                  >
+                </td>
+              </tr>
+              <tr>
+                <td class="bg-light" style="color: black">
+                  <span
+                    class="badge badge-secondary"
+                    style="background-color: #ed5565"
+                    >14 Dec</span
+                  >
+                  aditya
+                  <i class="text-secondary">
+                    paid <b style="color: rgb(185, 17, 17)">₹12</b></i
+                  >
+                  to you for
+                  <i class="text-secondary">your wish</i>
+                </td>
+              </tr>
+              <tr>
+                <td class="bg-light" style="color: black">
+                  <span
+                    class="badge badge-secondary"
+                    style="background-color: #ed5565"
+                    >13 Dec</span
+                  >
+                  you
+                  <i class="text-secondary">
+                    paid <b style="color: rgb(11, 138, 49)">₹78</b></i
+                  >
+                  to sood for
+                  <i class="text-secondary">dairy milk silk</i>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

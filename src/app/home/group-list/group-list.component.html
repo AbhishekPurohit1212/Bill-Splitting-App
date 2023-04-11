@@ -1,0 +1,177 @@
+<div class="d-flex justify-content-center" *ngIf="showSpinner">
+  <div class="spinner-border" role="status">
+    <span class="sr-only" id="loading"></span>
+  </div>
+</div>
+<div>
+  <div class="card my-2" style="box-shadow: 6px 6px 5px rgba(17, 17, 17, 0.1)">
+    <h5 class="card-header" style="background-color: hsl(354, 81%, 63%)">
+      Group Name <fa-icon [icon]="faUsers"></fa-icon> {{ groupList.length }}
+    </h5>
+    <div class="card-body">
+      <div class="list-group" *ngFor="let groupName of groupList">
+        <a
+          [routerLink]="['/home/group/', groupName.group[0]._id]"
+          class="
+            list-group-item list-group-item-action list-group-item
+            groupName
+          "
+          style="margin-top: 10px"
+          >{{ groupName["group"][0]["name"] }}
+          <fa-icon [icon]="faUser"></fa-icon>
+          {{ groupName["group"][0]["total_persons"] }}</a
+        >
+      </div>
+    </div>
+
+    <div>
+      <!-- Button trigger modal -->
+      <div class="row">
+        <div class="col col-lg-6">
+          <input
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal2"
+            value="Add to group"
+          />
+        </div>
+        <div class="col col-lg-6">
+          <input
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+            value="Create"
+          />
+        </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">
+                Create New Group
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <form
+              #createGroupForm="ngForm"
+              (ngSubmit)="
+                createGroupForm.valid && onSubmitCreateForm(createGroupForm)
+              "
+            >
+              <div class="modal-body">
+                <!-- created a variable "fullName" and assigned its value ngmodel. name attribute of input tag = fullName. Here ngclass is used to create dynamic class on html for using it in CSS-->
+                <input
+                  type="text"
+                  #fullName="ngModel"
+                  [(ngModel)]="groupService.name1"
+                  name="name"
+                  placeholder="type group name"
+                  required
+                  [ngClass]="{
+                    'invalid-textbox':
+                      createGroupForm.submitted && !fullName.valid
+                  }"
+                />
+                <!-- here we create invalid-textbox dynamic class on input tag  which is created only when "createGroupForm.submitted && !fullName.valid" becomes true  -->
+                <div *ngIf="createGroupForm.submitted && !fullName.valid">
+                  <label class="validation-message"
+                    >This field is required.</label
+                  >
+                </div>
+              </div>
+              <div class="modal-footer">
+                <input type="submit" value="create" />
+              </div>
+            </form>
+            <!-- Success message -->
+            <div class="success" *ngIf="showSucessMessage1">
+              {{ showSucessMessage1 }}
+            </div>
+
+            <!-- Error message -->
+            <div class="alert" *ngIf="serverErrorMessages1">
+              {{ serverErrorMessages1 }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="modal fade"
+        id="exampleModal2"
+        tabindex="-1"
+        aria-labelledby="exampleModal2Label"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModal2Label">
+                add into a Group
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <form
+              #searchAndAGroup="ngForm"
+              (ngSubmit)="
+                searchAndAGroup.valid && onSubmitSearchForm(searchAndAGroup)
+              "
+            >
+              <div class="modal-body">
+                <!-- created a variable "fullName" and assigned its value ngmodel. name attribute of input tag = fullName. Here ngclass is used to create dynamic class on html for using it in CSS-->
+                <input
+                  type="text"
+                  #fullName="ngModel"
+                  [(ngModel)]="groupService.name2"
+                  name="fullName"
+                  placeholder="type full group name"
+                  required
+                  [ngClass]="{
+                    'invalid-textbox':
+                      searchAndAGroup.submitted && !fullName.valid
+                  }"
+                />
+                <!-- here we create invalid-textbox dynamic class on input tag  which is created only when "searchAndAGroup.submitted && !fullName.valid" becomes true  -->
+                <div *ngIf="searchAndAGroup.submitted && !fullName.valid">
+                  <label class="validation-message"
+                    >This field is required.</label
+                  >
+                </div>
+              </div>
+              <div class="modal-footer">
+                <input type="submit" value="Add to group" />
+              </div>
+            </form>
+            <!-- Success message -->
+            <div class="success" *ngIf="showSucessMessage2">
+              {{ showSucessMessage2 }}
+            </div>
+
+            <!-- Error message -->
+            <div class="alert" *ngIf="serverErrorMessages2">
+              {{ serverErrorMessages2 }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

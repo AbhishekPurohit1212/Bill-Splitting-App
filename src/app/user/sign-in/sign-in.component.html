@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center" *ngIf="showSpinner">
+  <div class="spinner-border" role="status">
+    <span class="sr-only" id="loading"></span>
+  </div>
+</div>
+<div>
+  <img
+    src="../../../assets/img/faa43fcf41844550b7a34ce866dcd8d9.png"
+    id="icon"
+    alt="Splitter Icon"
+  />
+</div>
+<form
+  #signInForm="ngForm"
+  (ngSubmit)="signInForm.valid && onSubmit(signInForm)"
+>
+  <input
+    type="text"
+    name="email"
+    #email="ngModel"
+    [(ngModel)]="model.email"
+    placeholder="Email"
+    [pattern]="emailRegex"
+    required
+    [ngClass]="{ 'invalid-textbox': signInForm.submitted && !email.valid }"
+  />
+  <div *ngIf="signInForm.submitted && email.errors?.pattern">
+    <label class="validation-message">Invalid email address.</label>
+  </div>
+  <input
+    type="password"
+    name="password"
+    #password="ngModel"
+    [(ngModel)]="model.password"
+    placeholder="Password"
+    required
+    minlength="4"
+    [ngClass]="{ 'invalid-textbox': signInForm.submitted && !password.valid }"
+  />
+  <div *ngIf="signInForm.submitted && password.errors?.minlength">
+    <label class="validation-message">Minimum 4 characters.</label>
+  </div>
+  <input [disabled]="disabled" type="submit" value="Sign In" />
+</form>
+<!-- Error message -->
+<div class="alert" *ngIf="serverErrorMessages">
+  {{ serverErrorMessages }}
+</div>

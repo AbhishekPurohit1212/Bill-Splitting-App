@@ -1,0 +1,121 @@
+<div class="d-flex justify-content-center" *ngIf="showSpinner">
+  <div class="spinner-border" role="status">
+    <span class="sr-only" id="loading"></span>
+  </div>
+</div>
+<div class="container">
+  <div class="main-body">
+    <div class="row gutters-sm">
+      <div class="col-md-4 mb-3">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex flex-column align-items-center text-center">
+              <img
+                src="https://bootdey.com/img/Content/avatar/avatar7.png"
+                alt="Admin"
+                class="rounded-circle"
+                width="150"
+              />
+              <div class="mt-3">
+                <h4>Hey! {{ userDetails.fullName.split(" ")[0] }}</h4>
+                <p class="text-secondary mb-1">{{ userDetails.email }}</p>
+                <p class="text-secondary mb-1">Splitter User😍</p>
+                <input type="button" (click)="onLogout()" value="Logout" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="card mb-3">
+          <div class="card-body">
+            <form
+              #editProfileForm="ngForm"
+              (ngSubmit)="editProfileForm.valid && onSubmit(editProfileForm)"
+            >
+              <!-- created a variable "fullName" and assigned its value ngmodel. name attribute of input tag = fullName. Here ngclass is used to create dynamic class on html for using it in CSS-->
+              <input
+                type="text"
+                #fullName="ngModel"
+                [(ngModel)]="userService.model.fullName"
+                name="fullName"
+                placeholder="Full Name"
+                [ngClass]="{
+                  'invalid-textbox':
+                    editProfileForm.submitted && !fullName.valid
+                }"
+              />
+              <!-- here we create invalid-textbox dynamic class on input tag  which is created only when "editProfileForm.submitted && !fullName.valid" becomes true  -->
+              <div *ngIf="editProfileForm.submitted && !fullName.valid">
+                <label class="validation-message"
+                  >This field is required.</label
+                >
+              </div>
+              <!-- pattern is input tag attribute to define regex for checks -->
+
+              <input
+                type="password"
+                #password="ngModel"
+                [(ngModel)]="userService.model.password"
+                name="password"
+                placeholder="Password"
+                minlength="4"
+                [ngClass]="{
+                  'invalid-textbox':
+                    editProfileForm.submitted && !password.valid
+                }"
+              />
+              <div *ngIf="editProfileForm.submitted && password.errors">
+                <label
+                  *ngIf="password.errors.required"
+                  class="validation-message"
+                  >This field is required.</label
+                >
+                <label
+                  *ngIf="password.errors.minlength"
+                  class="validation-message"
+                  >Enter atleast 4 characters.</label
+                >
+              </div>
+              <input
+                type="password"
+                #password="ngModel"
+                [(ngModel)]="userService.model.confirmPassword"
+                name="confirmPassword"
+                placeholder="confirmPassword"
+                minlength="4"
+                [ngClass]="{
+                  'invalid-textbox':
+                    editProfileForm.submitted && !password.valid
+                }"
+              />
+              <div *ngIf="editProfileForm.submitted && password.errors">
+                <label
+                  *ngIf="password.errors.required"
+                  class="validation-message"
+                  >This field is required.</label
+                >
+                <label
+                  *ngIf="password.errors.minlength"
+                  class="validation-message"
+                  >Enter atleast 4 characters.</label
+                >
+              </div>
+              <input [disabled]="disabled" type="submit" value="edit" />
+            </form>
+
+            <!-- Success message -->
+            <div class="success" *ngIf="showSucessMessage">
+              {{ showSucessMessage }}
+            </div>
+
+            <!-- Error message -->
+            <div class="alert" *ngIf="serverErrorMessages">
+              {{ serverErrorMessages }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
